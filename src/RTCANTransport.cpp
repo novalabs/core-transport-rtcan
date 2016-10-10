@@ -45,7 +45,7 @@ RTCANTransport::send(
    rtcan_msg_p->data     = msgp->get_raw_data();
    rtcan_msg_p->status   = RTCAN_MSG_READY;
 
-   rtcanTransmitI(&rtcan, rtcan_msg_p, 50);
+   rtcanTransmitI(rtcan, rtcan_msg_p, 50);
    return true;
 } // RTCANTransport::send
 
@@ -132,9 +132,9 @@ RTCANTransport::create_publisher(
    rtcan_headerp->status = RTCAN_MSG_READY;
 
    if (Topic::has_name(topic, MANAGEMENT_TOPIC_NAME) || Topic::has_name(topic, BOOTLOADER_TOPIC_NAME)) {
-      rtcanReceiveMask(&RTCAND1, rtcan_headerp, 0xFF00);
+      rtcanReceiveMask(rtcan, rtcan_headerp, 0xFF00);
    } else {
-      rtcanReceiveMask(&RTCAND1, rtcan_headerp, 0xFFFF);
+      rtcanReceiveMask(rtcan, rtcan_headerp, 0xFFFF);
    }
 
    return rpubp;
@@ -162,7 +162,7 @@ RTCANTransport::fill_raw_params(
    uint8_t      raw_params[]
 )
 {
-   *reinterpret_cast<rtcan_id_t*>(raw_params) = topic_id(topic);
+   *reinterpret_cast<rtcan_id_t*>(raw_params) = topic_id(topic); // TODO Check with M0
 }
 
 void
@@ -171,7 +171,7 @@ RTCANTransport::initialize(
 )
 {
    rtcanInit();
-   rtcanStart(&rtcan, &rtcan_config);
+   rtcanStart(rtcan, &rtcan_config);
 
    Topic&     mgmt_topic          = Middleware::instance.get_mgmt_topic();
    rtcan_id_t mgmt_topic_rtcan_id = topic_id(mgmt_topic);
@@ -197,7 +197,7 @@ RTCANTransport::initialize(
 } // RTCANTransport::initialize
 
 RTCANTransport::RTCANTransport(
-   RTCANDriver& rtcan
+   RTCANDriver* rtcan
 ) :
 #if CORE_IS_BOOTLOADER_BRIDGE
    Transport("rtcan"), rtcan(rtcan), header_pool(header_buffer, 10), mgmt_rsub(NULL), mgmt_rpub(NULL), boot_rsub(NULL), boot_rpub(NULL) {}
@@ -221,24 +221,24 @@ RTCANTransport::topic_id(
 
    // id 0 reserved to management topic
    if (&topic == &mgmt_topic) {
-      return((MANAGEMENT_TOPIC_ID << 8) | stm32_id8());
+      return((MANAGEMENT_TOPIC_ID << 8) | rtcanId());
    }
 
    // id 253 reserved to bootloader topic
    if (Topic::has_name(topic, BOOTLOADER_TOPIC_NAME)) {
-      return((BOOTLOADER_TOPIC_ID << 8) | stm32_id8());
+      return((BOOTLOADER_TOPIC_ID << 8) | rtcanId());
    }
 
    // id 254 reserved to test topic
    if (Topic::has_name(topic, TEST_TOPIC_NAME)) {
-      return((TEST_TOPIC_ID << 8) | stm32_id8());
+      return((TEST_TOPIC_ID << 8) | rtcanId());
    }
 
    if (index < 0) {
       return(255 << 8);
    }
 
-   rtcan_id = ((index & 0xFF) << 8) | stm32_id8();
+   rtcan_id = ((index & 0xFF) << 8) | rtcanId();
 
    return rtcan_id;
 } // RTCANTransport::topic_id

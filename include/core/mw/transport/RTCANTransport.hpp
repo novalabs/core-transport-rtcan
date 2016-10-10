@@ -31,7 +31,7 @@ class RTCANTransport:
    public Transport
 {
 private:
-   RTCANDriver& rtcan;
+   RTCANDriver* rtcan;
    // FIXME to move in pub/sub?
    rtcan_msg_t header_buffer[10];
    core::os::MemoryPool<rtcan_msg_t> header_pool;
@@ -99,7 +99,7 @@ private:
 
 public:
    RTCANTransport(
-      RTCANDriver& rtcan
+      RTCANDriver* rtcan
    );
    ~RTCANTransport();
 

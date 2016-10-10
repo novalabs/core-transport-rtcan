@@ -6,12 +6,13 @@
 
 #pragma once
 
+#include <rtcan.h>
+
 #include <core/mw/namespace.hpp>
 #include <core/common.hpp>
 #include <core/mw/RemotePublisher.hpp>
 #include <core/mw/StaticList.hpp>
 
-#include "rtcan.h"
 
 NAMESPACE_CORE_MW_BEGIN
 
