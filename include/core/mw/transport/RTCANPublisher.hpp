@@ -1,4 +1,4 @@
-/* COPYRIGHT (c) 2016 Nova Labs SRL
+/* COPYRIGHT (c) 2016-2017 Nova Labs SRL
  *
  * All rights reserved. All use of this software and documentation is
  * subject to the License Agreement located in the file LICENSE.
@@ -18,16 +18,16 @@ NAMESPACE_CORE_MW_BEGIN
 
 
 class RTCANPublisher:
-   public RemotePublisher
+    public RemotePublisher
 {
 public:
-   rtcan_msg_t rtcan_header; // FIXME should be private
+    rtcan_msg_t rtcan_header; // FIXME should be private
 
-   RTCANPublisher(
-      Transport& transport
-   );
-   virtual
-   ~RTCANPublisher();
+    RTCANPublisher(
+        Transport& transport
+    );
+    virtual
+    ~RTCANPublisher();
 };
 
 

@@ -1,4 +1,4 @@
-/* COPYRIGHT (c) 2016 Nova Labs SRL
+/* COPYRIGHT (c) 2016-2017 Nova Labs SRL
  *
  * All rights reserved. All use of this software and documentation is
  * subject to the License Agreement located in the file LICENSE.
@@ -13,12 +13,12 @@ NAMESPACE_CORE_MW_BEGIN
 
 bool
 RTCANSubscriber::fetch_unsafe(
-   Message*&       msgp,
-   core::os::Time& timestamp
+    Message*&       msgp,
+    core::os::Time& timestamp
 )
 {
-   (void)msgp;
-   (void)timestamp;
+    (void)msgp;
+    (void)timestamp;
 /*
    TimestampedMsgPtrQueue::Entry entry;
    if (tmsgp_queue.fetch_unsafe(entry)) { // NOTE: This is unsafe!
@@ -27,7 +27,7 @@ RTCANSubscriber::fetch_unsafe(
     return true;
    }
  */
-   return false;
+    return false;
 }
 
 #include "hal.h"
@@ -36,37 +36,37 @@ RTCANSubscriber::fetch_unsafe(
 
 bool
 RTCANSubscriber::notify_unsafe(
-   Message&              msg,
-   const core::os::Time& timestamp
+    Message&              msg,
+    const core::os::Time& timestamp
 )
 {
-   RTCANTransport* transportp = static_cast<RTCANTransport*>(get_transport());
+    RTCANTransport* transportp = static_cast<RTCANTransport*>(get_transport());
 
-   (void)timestamp;
+    (void)timestamp;
 
-   if (transportp->send(&msg, this)) {
-      return true;
-   }
+    if (transportp->send(&msg, this)) {
+        return true;
+    }
 
-   return false;
+    return false;
 }
 
 size_t
 RTCANSubscriber::get_queue_length() const
 {
-   return 0;
+    return 0;
 }
 
 RTCANSubscriber::RTCANSubscriber(
-   RTCANTransport&               transport,
-   TimestampedMsgPtrQueue::Entry queue_buf[],
-   size_t                        queue_length
+    RTCANTransport&               transport,
+    TimestampedMsgPtrQueue::Entry queue_buf[],
+    size_t                        queue_length
 )
-   :
-   RemoteSubscriber(transport)
+    :
+    RemoteSubscriber(transport)
 {
-   (void)queue_buf;
-   (void)queue_length;
+    (void)queue_buf;
+    (void)queue_length;
 }
 
 RTCANSubscriber::~RTCANSubscriber() {}
