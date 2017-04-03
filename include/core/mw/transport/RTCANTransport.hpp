@@ -65,6 +65,8 @@ private:
     RTCANPublisher*  boot_rpub;
 #endif
 
+    uint8_t rtcan_module_id;
+
 public:
     bool
     send(
@@ -79,7 +81,8 @@ public:
 
     void
     initialize(
-        const RTCANConfig& rtcan_config
+        const RTCANConfig& rtcan_config,
+        uint8_t            module_id
     );
 
     void
@@ -108,6 +111,7 @@ public:
     RTCANTransport(
         RTCANDriver* rtcan
     );
+
     ~RTCANTransport();
 
 private:
