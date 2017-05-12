@@ -56,13 +56,14 @@ private:
         BOOT_BUFFER_LENGTH = 4
     };
 
-    BootMsg boot_msgbuf[BOOT_BUFFER_LENGTH];
-    BootMsg bootmaster_msgbuf[BOOT_BUFFER_LENGTH];
+    bootloader::BootMsg           boot_msgbuf[BOOT_BUFFER_LENGTH];
+    bootloader::BootMasterMsg     bootmaster_msgbuf[BOOT_BUFFER_LENGTH];
     TimestampedMsgPtrQueue::Entry boot_msgqueue_buf[BOOT_BUFFER_LENGTH];
     TimestampedMsgPtrQueue::Entry bootmaster_msgqueue_buf[BOOT_BUFFER_LENGTH];
     RTCANSubscriber* boot_rsub;
     RTCANSubscriber* bootmaster_rsub;
     RTCANPublisher*  boot_rpub;
+    RTCANPublisher*  bootmaster_rpub;
 #endif
 
     uint8_t rtcan_module_id;

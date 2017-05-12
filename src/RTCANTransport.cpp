@@ -190,17 +190,20 @@ RTCANTransport::initialize(
     rtcan_id_t boot_topic_rtcan_id = topic_id(boot_topic);
 
     boot_rsub = reinterpret_cast<RTCANSubscriber*>(create_subscriber(boot_topic, boot_msgqueue_buf, BOOT_BUFFER_LENGTH));
-    subscribe(*boot_rsub, BOOTLOADER_TOPIC_NAME, boot_msgbuf, BOOT_BUFFER_LENGTH, sizeof(BootMsg));
+    subscribe(*boot_rsub, BOOTLOADER_TOPIC_NAME, boot_msgbuf, BOOT_BUFFER_LENGTH, sizeof(bootloader::BootMsg));
 
     boot_rpub = reinterpret_cast<RTCANPublisher*>(create_publisher(boot_topic, reinterpret_cast<const uint8_t*>(&boot_topic_rtcan_id)));
-    advertise(*boot_rpub, BOOTLOADER_TOPIC_NAME, core::os::Time::INFINITE, sizeof(BootMsg));
+    advertise(*boot_rpub, BOOTLOADER_TOPIC_NAME, core::os::Time::INFINITE, sizeof(bootloader::BootMsg));
 
     Topic&     bootmaster_topic = Middleware::instance.get_bootmaster_topic();
     rtcan_id_t bootmaster_topic_rtcan_id = topic_id(bootmaster_topic);
 
     bootmaster_rsub = reinterpret_cast<RTCANSubscriber*>(create_subscriber(bootmaster_topic, bootmaster_msgqueue_buf, BOOT_BUFFER_LENGTH));
-    subscribe(*bootmaster_rsub, BOOTLOADER_MASTER_TOPIC_NAME, bootmaster_msgbuf, BOOT_BUFFER_LENGTH, sizeof(BootMasterMsg));
-#endif
+    subscribe(*bootmaster_rsub, BOOTLOADER_MASTER_TOPIC_NAME, bootmaster_msgbuf, BOOT_BUFFER_LENGTH, sizeof(bootloader::BootMasterMsg));
+
+    bootmaster_rpub = reinterpret_cast<RTCANPublisher*>(create_publisher(bootmaster_topic, reinterpret_cast<const uint8_t*>(&bootmaster_topic_rtcan_id)));
+    advertise(*bootmaster_rpub, BOOTLOADER_MASTER_TOPIC_NAME, core::os::Time::INFINITE, sizeof(bootloader::BootMasterMsg));
+#endif // if CORE_IS_BOOTLOADER_BRIDGE
 
     Middleware::instance.add(*this);
 } // RTCANTransport::initialize
@@ -209,7 +212,7 @@ RTCANTransport::RTCANTransport(
     RTCANDriver* rtcan
 ) :
 #if CORE_IS_BOOTLOADER_BRIDGE
-    Transport("rtcan"), rtcan(rtcan), header_pool(header_buffer, 10), mgmt_rsub(NULL), mgmt_rpub(NULL), boot_rsub(NULL), bootmaster_rsub(NULL), boot_rpub(NULL), rtcan_module_id(0) {}
+    Transport("rtcan"), rtcan(rtcan), header_pool(header_buffer, 10), mgmt_rsub(NULL), mgmt_rpub(NULL), boot_rsub(NULL), bootmaster_rsub(NULL), boot_rpub(NULL), bootmaster_rpub(NULL), rtcan_module_id(0) {}
 
 #else
     Transport("rtcan"), rtcan(rtcan), header_pool(header_buffer, 10), mgmt_rsub(NULL), mgmt_rpub(NULL), rtcan_module_id(0) {}
