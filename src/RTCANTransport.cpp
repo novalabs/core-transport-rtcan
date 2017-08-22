@@ -16,12 +16,6 @@
 #include <ch.h>
 #include <hal.h>
 
-static void
-xxx(
-    rtcan_rxframe_t* rxf,
-    rtcan_msg_t*     msgp
-);
-
 NAMESPACE_CORE_MW_BEGIN
 
 bool
@@ -141,9 +135,6 @@ RTCANTransport::create_publisher(
     if (Topic::has_name(topic, MANAGEMENT_TOPIC_NAME) || Topic::has_name(topic, BOOTLOADER_TOPIC_NAME) || Topic::has_name(topic, BOOTLOADER_MASTER_TOPIC_NAME)) {
         rtcanReceiveMask(rtcan, rtcan_headerp, 0xFF00);
     } else {
-        if(Topic::has_name(topic, "climate_01")) {
-            rtcan_headerp->rx_isr   = (void*)(xxx);
-        }
         rtcanReceiveMask(rtcan, rtcan_headerp, 0xFFFF);
     }
 
@@ -270,71 +261,3 @@ RTCANTransport::topic_id(
 } // RTCANTransport::topic_id
 
 NAMESPACE_CORE_MW_END
-
-
-
-#include "rtcan_lld_can.h"
-
-static void
-xxx(
-    rtcan_rxframe_t* rxf,
-    rtcan_msg_t*     msgp
-)
-{
-    static uint32_t cnt = 0;
-    static uint32_t tot = 0;
-
-    tot++;
-
-    if (msgp->status == RTCAN_MSG_READY) {
-        msgp->status = RTCAN_MSG_ONAIR;
-        msgp->ptr    = (uint8_t*)msgp->data;
-        msgp->id     = (rxf->id >> 7) & 0xFFFF;
-
-        /* Reset fragment counter. */
-        if (msgp->size > RTCAN_FRAME_SIZE) {
-            msgp->fragment = (msgp->size - 1) / RTCAN_FRAME_SIZE;
-        } else {
-            msgp->fragment = 0;
-        }
-    }
-
-    if (msgp->status == RTCAN_MSG_ONAIR) {
-        uint32_t i;
-
-        /* check source (needed by mw v2). */
-        uint8_t source     = (rxf->id >> 7) & 0xFF;
-        uint8_t prevsource = msgp->id & 0xFF;
-
-        if (source != prevsource) {
-//      if (msgp->id != ((rxf.id >> 7) & 0xFFFF)) {
-            return;
-        }
-
-        /* check fragment */
-        uint8_t fragment = rxf->id & 0x7F;
-
-        if (fragment != msgp->fragment) {
-            msgp->status = RTCAN_MSG_READY;
-            return;
-        }
-
-        for (i = 0; i < rxf->len; i++) {
-            *(msgp->ptr++) = rxf->data8[i];
-        }
-
-        if (msgp->fragment > 0) {
-            msgp->fragment--;
-        } else {
-            if (msgp->callback) {
-                cnt++;
-                msgp->status = RTCAN_MSG_BUSY;
-                msgp->callback(msgp);
-            }
-        }
-    }
-
-    if (msgp->status == RTCAN_MSG_ERROR) {
-        msgp->callback(msgp);
-    }
-} /* rtcan_rx_isr_default */
