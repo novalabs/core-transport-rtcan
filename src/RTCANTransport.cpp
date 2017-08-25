@@ -132,7 +132,7 @@ RTCANTransport::create_publisher(
 
     rtcan_headerp->status = RTCAN_MSG_READY;
 
-    if (Topic::has_name(topic, MANAGEMENT_TOPIC_NAME) || Topic::has_name(topic, BOOTLOADER_TOPIC_NAME) || Topic::has_name(topic, BOOTLOADER_MASTER_TOPIC_NAME)) {
+    if (Topic::has_name(topic, MANAGEMENT_TOPIC_NAME)  || Topic::has_name(topic, RPC_TOPIC_NAME) || Topic::has_name(topic, BOOTLOADER_TOPIC_NAME) || Topic::has_name(topic, BOOTLOADER_MASTER_TOPIC_NAME)) {
         rtcanReceiveMask(rtcan, rtcan_headerp, 0xFF00);
     } else {
         rtcanReceiveMask(rtcan, rtcan_headerp, 0xFFFF);
@@ -234,6 +234,11 @@ RTCANTransport::topic_id(
     // id 0 reserved to management topic
     if (&topic == &mgmt_topic) {
         return (MANAGEMENT_TOPIC_ID << 8) | rtcan_module_id;
+    }
+
+    // id 251 reserved to rpc topic
+    if (Topic::has_name(topic, RPC_TOPIC_NAME)) {
+        return (RPC_TOPIC_ID << 8) | rtcan_module_id;
     }
 
     // id 252 reserved to bootloader master topic
