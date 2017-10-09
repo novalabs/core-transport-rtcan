@@ -177,7 +177,7 @@ RTCANTransport::initialize(
     rtcanInit();
     rtcanStart(rtcan, &rtcan_config);
 
-    Topic&     mgmt_topic = Middleware::instance.get_mgmt_topic();
+    Topic&     mgmt_topic = Middleware::instance().get_mgmt_topic();
     rtcan_id_t mgmt_topic_rtcan_id = topic_id(mgmt_topic);
 
     mgmt_rsub = reinterpret_cast<RTCANSubscriber*>(create_subscriber(mgmt_topic, mgmt_msgqueue_buf, MGMT_BUFFER_LENGTH));
@@ -187,7 +187,7 @@ RTCANTransport::initialize(
     advertise(*mgmt_rpub, MANAGEMENT_TOPIC_NAME, core::os::Time::INFINITE, sizeof(MgmtMsg));
 
 #if CORE_IS_BOOTLOADER_BRIDGE
-    Topic&     boot_topic = Middleware::instance.get_boot_topic();
+    Topic&     boot_topic = Middleware::instance().get_boot_topic();
     rtcan_id_t boot_topic_rtcan_id = topic_id(boot_topic);
 
     boot_rsub = reinterpret_cast<RTCANSubscriber*>(create_subscriber(boot_topic, boot_msgqueue_buf, BOOT_BUFFER_LENGTH));
@@ -196,7 +196,7 @@ RTCANTransport::initialize(
     boot_rpub = reinterpret_cast<RTCANPublisher*>(create_publisher(boot_topic, reinterpret_cast<const uint8_t*>(&boot_topic_rtcan_id)));
     advertise(*boot_rpub, BOOTLOADER_TOPIC_NAME, core::os::Time::INFINITE, sizeof(bootloader::BootMsg));
 
-    Topic&     bootmaster_topic = Middleware::instance.get_bootmaster_topic();
+    Topic&     bootmaster_topic = Middleware::instance().get_bootmaster_topic();
     rtcan_id_t bootmaster_topic_rtcan_id = topic_id(bootmaster_topic);
 
     bootmaster_rsub = reinterpret_cast<RTCANSubscriber*>(create_subscriber(bootmaster_topic, bootmaster_msgqueue_buf, BOOT_BUFFER_LENGTH));
@@ -206,7 +206,7 @@ RTCANTransport::initialize(
     advertise(*bootmaster_rpub, BOOTLOADER_MASTER_TOPIC_NAME, core::os::Time::INFINITE, sizeof(bootloader::BootMasterMsg));
 #endif // if CORE_IS_BOOTLOADER_BRIDGE
 
-    Middleware::instance.add(*this);
+    Middleware::instance().add(*this);
 } // RTCANTransport::initialize
 
 RTCANTransport::RTCANTransport(
@@ -226,8 +226,8 @@ RTCANTransport::topic_id(
     const Topic& topic
 ) const
 {
-    const StaticList<Topic>& topic_list = Middleware::instance.get_topics();
-    Topic&     mgmt_topic = Middleware::instance.get_mgmt_topic();
+    const StaticList<Topic>& topic_list = Middleware::instance().get_topics();
+    Topic&     mgmt_topic = Middleware::instance().get_mgmt_topic();
     int        index      = topic_list.index_of(topic) + 1;
     rtcan_id_t rtcan_id;
 
